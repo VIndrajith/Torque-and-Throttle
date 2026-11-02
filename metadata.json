@@ -1,0 +1,7 @@
+{
+  "name": "Torque & Throttle - Certified Preowned Car Marketplace",
+  "description": "Certified Preowned Car Marketplace featuring 210-point master tech inspections, technical dossiers, chassis evaluations, and nationwide warranty coverage across SUV, Sedans, Hatchback, and MPV categories.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

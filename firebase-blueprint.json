@@ -1,0 +1,131 @@
+{
+  "entities": {
+    "enquiry": {
+      "title": "Customer Vehicle Enquiry",
+      "description": "Customer inquiry submitted from a vehicle listing",
+      "type": "object",
+      "properties": {
+        "customer": {
+          "type": "object",
+          "description": "Customer contact information",
+          "properties": {
+            "name": { "type": "string", "minLength": 2, "maxLength": 100 },
+            "phone": { "type": "string", "minLength": 7, "maxLength": 20 },
+            "email": { "type": "string", "maxLength": 120 },
+            "preferredContact": { "type": "string", "enum": ["phone", "email", "whatsapp"] },
+            "message": { "type": "string", "maxLength": 2000 }
+          },
+          "required": ["name", "phone"]
+        },
+        "vehicle": {
+          "type": "object",
+          "description": "Selected vehicle information snapshot",
+          "properties": {
+            "id": { "type": "string", "maxLength": 128 },
+            "name": { "type": "string", "maxLength": 150 },
+            "year": { "type": "number" },
+            "location": { "type": "string", "maxLength": 80 },
+            "price": { "type": "number" }
+          },
+          "required": ["id", "name"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["new", "contacted", "follow_up", "inspection_scheduled", "negotiation", "closed", "cancelled"],
+          "description": "Enquiry progression lifecycle status"
+        },
+        "assignedAdminId": {
+          "type": "string",
+          "description": "ID of assigned admin or sales executive based on location"
+        },
+        "source": {
+          "type": "string",
+          "description": "Originating channel, defaults to website"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation server timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update server timestamp"
+        },
+        "notificationStatus": {
+          "type": "string",
+          "description": "Status of notification dispatch"
+        }
+      },
+      "required": ["customer", "vehicle", "status", "source", "createdAt", "updatedAt"]
+    },
+    "enquiryNote": {
+      "title": "Enquiry Internal Note",
+      "description": "Internal communication or log entry for an enquiry",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string", "minLength": 1, "maxLength": 3000 },
+        "createdBy": { "type": "string", "description": "Admin UID" },
+        "createdByName": { "type": "string", "description": "Admin display name" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["text", "createdBy", "createdAt"]
+    },
+    "adminUser": {
+      "title": "Admin Profile",
+      "description": "Authorized administrator or sales personnel profile",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "enum": ["admin", "sales", "superadmin"] },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 120 },
+        "location": { "type": "string", "maxLength": 80 }
+      },
+      "required": ["role", "name", "email"]
+    },
+    "vehicle": {
+      "title": "Vehicle Registry Record",
+      "description": "Certified showroom inventory vehicle registered with the 13 database parameters",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "make": { "type": "string", "maxLength": 100, "description": "1. Company" },
+        "model": { "type": "string", "maxLength": 100, "description": "2. Model" },
+        "year": { "type": "number", "description": "3. Year" },
+        "category": { "type": "string", "maxLength": 50, "description": "4. Category" },
+        "trim": { "type": "string", "maxLength": 150, "description": "5. Trim" },
+        "engine": { "type": "string", "maxLength": 150, "description": "6. Engine Description" },
+        "powerHp": { "type": "number", "description": "7. Power (HP)" },
+        "torque": { "type": "number", "description": "8. Torque" },
+        "transmission": { "type": "string", "maxLength": 100, "description": "9. Transmission" },
+        "drivetrain": { "type": "string", "maxLength": 50, "description": "10. Drivetrain" },
+        "mileage": { "type": "number", "description": "11. Odometer" },
+        "owners": { "type": "number", "description": "12. Owner Count" },
+        "exteriorColor": { "type": "string", "maxLength": 80, "description": "14. Exterior Paint" },
+        "imageUrl": { "type": "string", "maxLength": 2000 },
+        "galleryImages": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["available", "reserved", "sold"] },
+        "isSold": { "type": "boolean" }
+      },
+      "required": ["id", "year", "make", "model", "status"]
+    }
+  },
+  "firestore": {
+    "/vehicles/{vehicleId}": {
+      "schema": "vehicle",
+      "description": "Collection of certified performance inventory vehicles"
+    },
+    "/enquiries/{enquiryId}": {
+      "schema": "enquiry",
+      "description": "Collection of customer vehicle enquiries"
+    },
+    "/enquiries/{enquiryId}/notes/{noteId}": {
+      "schema": "enquiryNote",
+      "description": "Internal confidential notes for an enquiry"
+    },
+    "/admins/{adminId}": {
+      "schema": "adminUser",
+      "description": "Authorized admin users with role and regional assignment"
+    }
+  }
+}

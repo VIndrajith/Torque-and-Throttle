@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Torque & Throttle — Comprehensive Architectural Explanation & Study Roadmap</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #c00017;
+      --primary-light: #ff4d4f;
+      --bg-dark: #0f172a;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --code-bg: #f8fafc;
+      --badge-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-main);
+      background-color: #f8fafc;
+      line-height: 1.6;
+      font-size: 14px;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 48px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+    }
+
+    .header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .brand-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    .doc-meta {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .print-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+      transition: background 0.2s;
+    }
+
+    .print-btn:hover {
+      background: #990012;
+    }
+
+    h1, h2, h3, h4 {
+      color: #0f172a;
+      font-weight: 700;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    h2 {
+      font-size: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    h3 {
+      font-size: 16px;
+      color: #334155;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 16px;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: #c00017;
+    }
+
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--badge-bg);
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      margin-right: 4px;
+    }
+
+    .roadmap-phase {
+      position: relative;
+      padding-left: 24px;
+      border-left: 2px solid #cbd5e1;
+      margin-bottom: 24px;
+    }
+
+    .roadmap-phase::before {
+      content: '';
+      position: absolute;
+      left: -7px;
+      top: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid #fff;
+    }
+
+    .roadmap-phase-title {
+      font-weight: 700;
+      font-size: 16px;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        background: #fff;
+        font-size: 12px;
+      }
+      .container {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <span style="font-size: 13px; color: var(--text-muted);">To save as PDF: click the button below or press <b>Ctrl + P</b> (Cmd + P on Mac) and select <b>"Save as PDF"</b>.</span>
+      <button class="print-btn" onclick="window.print()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Export / Print as PDF
+      </button>
+    </div>
+
+    <header class="header">
+      <div>
+        <div class="brand-title">TORQUE & THROTTLE</div>
+        <div class="brand-subtitle">Automotive Vault & Dealer Platform — Technical Project Guide</div>
+      </div>
+      <div class="doc-meta">
+        <div><strong>Version:</strong> 2.0.0 Architecture</div>
+        <div><strong>Stack:</strong> React 19 + TypeScript + Express + Cloud SQL + Firebase + Supabase</div>
+        <div><strong>Generated:</strong> October 2026</div>
+      </div>
+    </header>
+
+    <section>
+      <h2>1. Project Overview & Core Mission</h2>
+      <p>
+        <strong>Torque & Throttle</strong> is a high-performance, full-stack automotive boutique platform and enterprise management system. It combines an ultra-luxury supercar showroom experience on the client side with a robust dealer inventory engine, real-time telemetry inspection, customer lead pipeline, and dual-database sync architecture (Firebase Firestore + PostgreSQL Cloud SQL / Supabase).
+      </p>
+
+      <div class="card">
+        <div class="card-title">Key Capabilities at a Glance:</div>
+        <ul>
+          <li><strong>Client Showroom:</strong> Interactive vault catalog, multi-criteria filtering, dyno torque curves, inspection point breakdowns, test drive scheduling, and bespoke model sourcing.</li>
+          <li><strong>Admin Vault Management:</strong> Protected administrative portal with Role-Based Access Control (RBAC), live inventory CRUD, drag-and-drop image compression, and status tracking.</li>
+          <li><strong>Lead & Webhook Pipeline:</strong> Real-time lead capture dispatched across email, SMS/WhatsApp notifications, and external Make.com AI agent automation webhooks with automatic retries.</li>
+          <li><strong>Dual Persistence:</strong> Seamless offline-ready Firestore cache with real-time listeners paired with PostgreSQL Cloud SQL & optional Supabase storage sync.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Architecture & Directory Tree Walkthrough</h2>
+      <p>Here is the detailed breakdown of the project structure and what each module does:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Directory / File</th>
+            <th>Primary Function</th>
+            <th>Key Concepts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>server.ts</code></td>
+            <td>Express backend entry point, API routes & Vite middleware runner</td>
+            <td>REST endpoints, token authentication middleware, compression, image proxy, webhook relay</td>
+          </tr>
+          <tr>
+            <td><code>src/App.tsx</code></td>
+            <td>Client routing, state management, modal controllers, global search</td>
+            <td>Hash-based routing, real-time Firestore listeners, dynamic category filtering</td>
+          </tr>
+          <tr>
+            <td><code>src/types.ts</code></td>
+            <td>TypeScript interfaces for Vehicles, Dyno Telemetry, Enquiries, Users</td>
+            <td>Type safety, domain models, audit logs, filter state interfaces</td>
+          </tr>
+          <tr>
+            <td><code>src/components/</code></td>
+            <td>Customer-facing interactive showroom components</td>
+            <td><code>Navbar</code>, <code>Hero</code>, <code>InventoryPage</code>, <code>VehicleGrid</code>, <code>VehicleDetailPage</code>, <code>BookingForm</code></td>
+          </tr>
+          <tr>
+            <td><code>src/components/admin/</code></td>
+            <td>Secured Dealer Control Panel</td>
+            <td><code>AdminDashboard</code>, <code>AdminLogin</code>, <code>AddVehicleModal</code>, <code>EditVehicleModal</code>, <code>TelemetryInspector</code></td>
+          </tr>
+          <tr>
+            <td><code>src/db/</code></td>
+            <td>PostgreSQL & Drizzle ORM schemas and queries</td>
+            <td><code>schema.ts</code>, <code>vehicles.ts</code>, <code>enquiries.ts</code>, <code>users.ts</code>, <code>seed.ts</code></td>
+          </tr>
+          <tr>
+            <td><code>src/firebase/</code></td>
+            <td>Firebase Auth, Firestore real-time sync, and notification dispatchers</td>
+            <td><code>firebase.ts</code>, <code>authService.ts</code>, <code>vehicleService.ts</code>, <code>notificationService.ts</code></td>
+          </tr>
+          <tr>
+            <td><code>src/supabase/</code></td>
+            <td>Optional Supabase fleet synchronization and storage engine</td>
+            <td><code>supabaseClient.ts</code>, <code>supabaseVehicleService.ts</code></td>
+          </tr>
+          <tr>
+            <td><code>src/utils/</code></td>
+            <td>Helper services and utilities</td>
+            <td><code>mailDispatcher.ts</code> (FormSubmit & webhook relay), <code>imageCompressor.ts</code> (client-side canvas compression)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="page-break"></div>
+
+    <section>
+      <h2>3. Deep Dive into Core Subsystems</h2>
+
+      <h3>A. Client-Side Routing & Vault Display</h3>
+      <p>
+        The application employs a deterministic hash and pathname resolver in <code>src/App.tsx</code> supporting paths like <code>/#/inventory</code>, <code>/#/admin</code>, and <code>/#/vehicle/:id</code>. This guarantees zero 404s when running in embedded iFrames or single-page host environments.
+      </p>
+
+      <h3>B. Telemetry & Inspection Engine</h3>
+      <p>
+        Vehicles in Torque & Throttle are not just photo cards; they contain comprehensive engineering telemetry:
+      </p>
+      <ul>
+        <li><strong>Dyno Telemetry:</strong> RPM vs. BHP & Torque curve coordinates, ECU flash counter, boost pressure (PSI), ambient temperature, and dyno correction factors.</li>
+        <li><strong>Multi-Point Inspection:</strong> Paint panel depth readings (Microns) distinguishing Factory, Blend, and PPF; brake pad thickness, tire tread depths, and cylinder compression PSI.</li>
+      </ul>
+
+      <h3>C. High-Reliability Lead Pipeline & Webhooks</h3>
+      <p>
+        When a customer books a test drive or submits an enquiry:
+      </p>
+      <ol>
+        <li>The form payload is validated and normalized in <code>src/utils/mailDispatcher.ts</code>.</li>
+        <li>It sends data to the server backend (<code>/api/enquiries</code>) to persist in database storage.</li>
+        <li>The backend relays the lead to external AI Agent automation (Make.com webhook) with a dual-attempt retry policy and safety timeouts.</li>
+        <li>Instant visual confirmation and tracking reference IDs are provided to the user.</li>
+      </ol>
+
+      <h3>D. Image Optimization & Storage</h3>
+      <p>
+        To prevent bandwidth bloat and maintain blazing load times, <code>src/utils/imageCompressor.ts</code> uses HTML5 Canvas to automatically compress uploaded photos on the client before transmitting to cloud storage or base64 database representations.
+      </p>
+    </section>
+
+    <section>
+      <h2>4. Complete Step-by-Step Study Roadmap</h2>
+      <p>Follow this chronological learning roadmap to master every layer of this codebase:</p>
+
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-title">Phase 1: Foundations & Type Definitions (Day 1)</div>
+        <p><strong>Focus:</strong> Understand the domain models and data architecture.</p>
+        <ul>
+          <li>Study <code>src/types.ts</code> to see how <code>Vehicle</code>, <code>VehicleSpecs</code>, <code>DynoTelemetry</code>, and <code>Enquiry</code> are structured.</li>
+          <li>Review <code>src/data/inventory.ts</code> to inspect sample records, specs, and dyno data points.</li>
+          <li><strong>Exercise:</strong> Add a new field (e.g., <code>exhaustNoteUrl?: string</code>) to <code>Vehicle</code> and inspect type-check errors across the project.</li>
+        </ul>
+      </div>
+
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-title">Phase 2: Express Server & Backend APIs (Day 2)</div>
+        <p><strong>Focus:</strong> Understand the API design, security, and webhook relays.</p>
+        <ul>
+          <li>Examine <code>server.ts</code>: observe how Vite middleware is mounted in development vs. static serving in production.</li>
+          <li>Trace the <code>/api/webhook-relay</code> endpoint to understand how network retries and timeout abort controllers work.</li>
+          <li>Review <code>src/middleware/auth.ts</code> and token validation.</li>
+        </ul>
+      </div>
+
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-title">Phase 3: Database & Drizzle ORM (Day 3)</div>
+        <p><strong>Focus:</strong> Relational schema design and data access patterns.</p>
+        <ul>
+          <li>Inspect <code>src/db/schema.ts</code> for PostgreSQL table definitions with JSONB columns for telemetry.</li>
+          <li>Review <code>src/db/vehicles.ts</code> and <code>src/db/enquiries.ts</code> for CRUD operations.</li>
+          <li>Check <code>src/db/seed.ts</code> for automated database population.</li>
+        </ul>
+      </div>
+
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-title">Phase 4: Client State & UI Components (Day 4)</div>
+        <p><strong>Focus:</strong> React 19 component hierarchy, Tailwind styling, and reactive filters.</p>
+        <ul>
+          <li>Trace <code>src/App.tsx</code>: note the <code>useMemo</code> calculations for multi-criteria filtering and category counts.</li>
+          <li>Explore <code>src/components/InventoryPage.tsx</code>, <code>FilterBar.tsx</code>, and <code>VehicleDetailPage.tsx</code>.</li>
+          <li>Analyze <code>src/components/VehicleImageSlider.tsx</code> for interactive gallery rendering.</li>
+        </ul>
+      </div>
+
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-title">Phase 5: Admin Portal, Security & RBAC (Day 5)</div>
+        <p><strong>Focus:</strong> Administrative workflows and modal dialogs.</p>
+        <ul>
+          <li>Review <code>src/components/admin/AdminLogin.tsx</code> and <code>AdminDashboard.tsx</code>.</li>
+          <li>Inspect <code>src/components/admin/AddVehicleModal.tsx</code> and <code>EditVehicleModal.tsx</code> for form management and client-side image compression.</li>
+          <li>Study <code>src/components/admin/TelemetryInspector.tsx</code> to see how inspection metrics are audited.</li>
+        </ul>
+      </div>
+
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-title">Phase 6: Deployment & Performance Optimization (Day 6)</div>
+        <p><strong>Focus:</strong> Production bundling, caching headers, and responsive UX.</p>
+        <ul>
+          <li>Check <code>package.json</code> and <code>vite.config.ts</code> for build scripts and asset splitting.</li>
+          <li>Review HTTP caching headers in <code>server.ts</code> (immutable asset caching vs. HTML revalidation).</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer style="margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between;">
+      <span>Torque & Throttle Architectural Guide</span>
+      <span>AI Studio Build — Clean Production Architecture</span>
+    </footer>
+  </div>
+</body>
+</html>

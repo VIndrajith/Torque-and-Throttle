@@ -1,0 +1,123 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperAdminUser() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'indrajith08102003@gmail.com' && request.auth.token.email_verified == true) ||
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'superadmin')
+      );
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        isSuperAdminUser() ||
+        (request.auth.token.email == 'sudhakaransanjay921@gmail.com' && request.auth.token.email_verified == true) ||
+        (request.auth.token.email.matches('.*@torquethrottle[.]com$') && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Customer enquiry validation
+    function isValidEnquiryCreate(data) {
+      return data.keys().hasAll(['customer', 'vehicle', 'status', 'source', 'createdAt', 'updatedAt']) &&
+        data.customer is map &&
+        data.customer.keys().hasAll(['name', 'phone']) &&
+        data.customer.name is string &&
+        data.customer.name.size() >= 2 &&
+        data.customer.name.size() <= 100 &&
+        data.customer.phone is string &&
+        data.customer.phone.size() >= 7 &&
+        data.customer.phone.size() <= 20 &&
+        (!('email' in data.customer) || (data.customer.email is string && data.customer.email.size() <= 120)) &&
+        (!('message' in data.customer) || (data.customer.message is string && data.customer.message.size() <= 2000)) &&
+        (!('preferredContact' in data.customer) || (data.customer.preferredContact in ['phone', 'email', 'whatsapp'])) &&
+        data.vehicle is map &&
+        data.vehicle.keys().hasAll(['id', 'name']) &&
+        data.vehicle.id is string &&
+        data.vehicle.id.size() <= 128 &&
+        data.vehicle.name is string &&
+        data.vehicle.name.size() <= 150 &&
+        data.status == 'new' &&
+        data.source is string &&
+        data.source.size() <= 50 &&
+        data.createdAt == request.time &&
+        data.updatedAt == request.time;
+    }
+
+    function isValidEnquiryUpdate(data) {
+      return data.status in ['new', 'contacted', 'follow_up', 'inspection_scheduled', 'negotiation', 'closed', 'cancelled'] &&
+        data.updatedAt == request.time &&
+        data.createdAt == existing().createdAt &&
+        data.vehicle.id == existing().vehicle.id;
+    }
+
+    function isValidNote(data) {
+      return data.keys().hasAll(['text', 'createdBy', 'createdAt']) &&
+        data.text is string &&
+        data.text.size() >= 1 &&
+        data.text.size() <= 3000 &&
+        data.createdBy == request.auth.uid &&
+        data.createdAt == request.time;
+    }
+
+    function isValidVehicle(data) {
+      return data.keys().hasAll(['id', 'make', 'model', 'year', 'status']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.make is string && data.make.size() <= 100 &&
+        data.model is string && data.model.size() <= 100 &&
+        data.year is number &&
+        data.status in ['available', 'reserved', 'sold'];
+    }
+
+    // Vehicles Collection (Public showroom inventory, admin and real-time sync)
+    match /vehicles/{vehicleId} {
+      allow read: if true;
+      allow create, update: if isValidId(vehicleId) && isValidVehicle(incoming());
+      allow delete: if isValidId(vehicleId);
+    }
+
+    // Enquiries Collection - Storage in Firestore disabled per configuration
+    match /enquiries/{enquiryId} {
+      allow create, write: if false;
+      allow read: if isAdmin();
+      allow update, delete: if isSuperAdminUser();
+
+      // Internal notes subcollection
+      match /notes/{noteId} {
+        allow read: if isAdmin();
+        allow create, write: if false;
+        allow update, delete: if isSuperAdminUser();
+      }
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow read: if isSignedIn() && (request.auth.uid == adminId || isAdmin());
+      allow create, update, delete: if isSuperAdminUser();
+    }
+  }
+}

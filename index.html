@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Torque & Throttle - Certified Preowned Car Marketplace</title>
+    <meta name="description" content="Certified Preowned Car Marketplace featuring 210-point master tech inspections, technical dossiers, chassis evaluations, and nationwide warranty coverage across SUV, Sedans, Hatchback, and MPV categories." />
+    <meta property="og:title" content="Torque & Throttle - Certified Preowned Car Marketplace" />
+    <meta property="og:description" content="Certified Preowned Car Marketplace featuring 210-point master tech inspections, technical dossiers, chassis evaluations, and nationwide warranty coverage across SUV, Sedans, Hatchback, and MPV categories." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/jpeg" href="/logo-icon.jpg" />
+    <link rel="apple-touch-icon" href="/logo.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Satisfy&display=swap" rel="stylesheet">
+    <script>
+      // Suppress benign Vite dev server WebSocket/HMR reconnection messages in cloud preview
+      window.addEventListener('unhandledrejection', function(event) {
+        var msg = (event && event.reason && (event.reason.message || event.reason.stack || '' + event.reason)) || '';
+        if (typeof msg === 'string' && (msg.indexOf('WebSocket') !== -1 || msg.indexOf('vite') !== -1 || msg.indexOf('ws:') !== -1 || msg.indexOf('wss:') !== -1)) {
+          event.stopImmediatePropagation();
+          event.preventDefault();
+        }
+      }, true);
+      window.addEventListener('error', function(event) {
+        var msg = (event && (event.message || (event.error && event.error.message) || '' + event)) || '';
+        if (typeof msg === 'string' && (msg.indexOf('WebSocket') !== -1 || msg.indexOf('vite') !== -1 || msg.indexOf('failed to connect') !== -1)) {
+          event.stopImmediatePropagation();
+          event.preventDefault();
+        }
+      }, true);
+    </script>
+  </head>
+  <body class="bg-[#0F1115] text-[#E2E2E8] antialiased selection:bg-[#E5252A] selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
