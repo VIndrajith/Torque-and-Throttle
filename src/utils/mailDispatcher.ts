@@ -1,7 +1,7 @@
 export const AI_AGENT_WEBHOOK_URL =
   (import.meta as any).env?.VITE_AI_AGENT_WEBHOOK_URL ||
-  'https://hook.eu1.make.com/oegp35uomovhnm2gtix2jrem19rnhc4k';
-export const TARGET_CONTACT_EMAIL = 'sudhakaransanjay921@gmail.com';
+  'https://hook.eu1.make.com/ytj32r0dgztr8h7fqn28bdc4efbfvygg';
+export const TARGET_CONTACT_EMAIL = 'indrajithv8102003@gmail.com';
 
 export interface DeliveryResponse {
   success: boolean;
